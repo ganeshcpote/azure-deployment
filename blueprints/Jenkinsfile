@@ -9,7 +9,7 @@ pipeline {
   stages {
     stage('Terraform Init') {
       steps {
-	dir('blueprints/${blueprint_name}') {  
+	dir("blueprints/${blueprint_name}") {  
 		sh "terraform init -backend-config=\"conn_str=postgres://jenkins:jenkins@localhost/terraformstate?sslmode=disable\" -input=false"
 		sh "terraform workspace new blueprint_provisioning_${BUILD_ID}_state"
 		sh "terraform workspace select  blueprint_provisioning_${BUILD_ID}_state"
@@ -20,7 +20,7 @@ pipeline {
     }
     stage('Terraform Plan') {
       steps {
-		dir('blueprints/${blueprint_name}') {   
+		dir("blueprints/${blueprint_name}") {   
 			sh "terraform plan -out=tfplan"
 			sh "terraform show -no-color tfplan > ${BUILD_ID}_tfplan.txt"
 		}
@@ -28,7 +28,7 @@ pipeline {
     }
    stage('Terraform Apply') {
       steps {
-		dir('blueprints/${blueprint_name}') {   
+		dir("blueprints/${blueprint_name}") {   
 			sh "terraform apply -input=false -auto-approve tfplan"
 			sh "terraform output"
 			sh "echo ***********************************"
@@ -71,7 +71,7 @@ pipeline {
   }
   stage('Terraform Destroy Approval') {
 	   steps {
-		   dir('blueprints/${blueprint_name}') {  
+		   dir("blueprints/${blueprint_name}") {  
             script {
                 def plan = readFile "${BUILD_ID}_tfplan.txt"
                 input message: "Do you want to destroy the plan?",
@@ -82,7 +82,7 @@ pipeline {
     }
   stage('Terraform Destroy') {
       steps {
-		dir('blueprints/${blueprint_name}') {   
+		dir("blueprints/${blueprint_name}") {   
 			sh "terraform workspace select blueprint_provisioning_${BUILD_ID}_state"
 			sh "terraform destroy -input=false -auto-approve"
 		}
@@ -91,7 +91,7 @@ pipeline {
   }
   post {
         always {
-			dir('blueprints/${blueprint_name}') { 
+			dir("blueprints/${blueprint_name}") { 
 				archiveArtifacts artifacts: "${BUILD_ID}_tfplan.txt"
 				cleanWs()
 			}
