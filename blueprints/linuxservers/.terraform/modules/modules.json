@@ -1,0 +1,1 @@
+{"Modules":[{"Key":"linuxservers","Source":"../../module/azure/vm/azurerm","Dir":"../../module/azure/vm/azurerm"},{"Key":"linuxservers.os","Source":"./os","Dir":"../../module/azure/vm/azurerm/os"},{"Key":"","Source":"","Dir":"."}]}

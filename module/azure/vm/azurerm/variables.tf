@@ -16,6 +16,11 @@ variable "azure_tenant_id" {
   description = "Azure Tenant ID"
 }
 
+variable "create_resource_group" {
+  description = "Whether to create resource group and use it for all networking resources"
+  default     = false
+}
+
 variable "resource_group_name" {
   description = "The name of the resource group in which the resources will be created"
   default     = "terraform-compute"

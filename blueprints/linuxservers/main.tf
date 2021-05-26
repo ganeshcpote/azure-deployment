@@ -3,7 +3,8 @@ provider "azurerm" {
    features {}
 }
  module "linuxservers" {
-    source              	= "../../module/azure/vm/azurerm"
+    source              	= "../../module/azure/vm/azurerm"\
+	create_resource_group   = false
     resource_group_name 	= "CMP"
 	azure_subscription_id	= "e24e76dc-df5a-4add-b57b-6aa3f0eae0ee"
 	azure_client_id			= "49dc5041-2873-4ee7-9a05-33723de63dbf"
