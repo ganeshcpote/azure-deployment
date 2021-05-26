@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   parameters {
-        string(name: 'run_id', defaultValue: 'test1', description: 'Please specify run_id')
+        string(name: 'run_id', defaultValue: UUID.randomUUID().toString(), description: 'Please specify run_id')
 		choice(name: 'blueprint_name', choices: ['linuxservers', 'windowsservers'], description: 'Provide blueprint name for provisioning' )
 		string(name: 'user_email', defaultValue: 'ganesh.pote@ril.com', description: 'Provide user email Id for notification') 
     }
