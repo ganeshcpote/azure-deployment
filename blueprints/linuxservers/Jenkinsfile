@@ -3,12 +3,13 @@ pipeline {
 
   parameters {
         string(name: 'run_id', defaultValue: 'test1', description: 'Please specify run_id')
-		string(name: 'user_email', defaultValue: 'ganesh.pote@ril.com', description: 'Provide user email Id for notification') 
+	string(name: 'blueprint_name', defaultValue: 'linuxservers', description: 'Provide blueprint name for provisioning') 
+	string(name: 'user_email', defaultValue: 'ganesh.pote@ril.com', description: 'Provide user email Id for notification') 
     }
   stages {
     stage('Terraform Init') {
       steps {
-	dir('azure-apache') {  
+	dir('blueprints\linuxservers') {  
 		sh "terraform init -backend-config=\"conn_str=postgres://jenkins:jenkins@localhost/terraformstate?sslmode=disable\" -input=false"
 		sh "terraform workspace new azure_${BUILD_ID}_state"
 		sh "terraform workspace select  azure_${BUILD_ID}_state"
@@ -19,7 +20,7 @@ pipeline {
     }
     stage('Terraform Plan') {
       steps {
-		dir('azure-apache') {   
+		dir('blueprints\linuxservers') {   
 			sh "terraform plan -out=tfplan"
 			sh "terraform show -no-color tfplan > ${BUILD_ID}_tfplan.txt"
 		}
@@ -27,7 +28,7 @@ pipeline {
     }
    stage('Terraform Apply') {
       steps {
-		dir('azure-apache') {   
+		dir('blueprints\linuxservers') {   
 			sh "terraform apply -input=false -auto-approve tfplan"
 			sh "terraform output"
 			sh "echo ***********************************"
@@ -86,7 +87,7 @@ pipeline {
   }
   stage('Terraform Destroy Approval') {
 	   steps {
-		   dir('azure-apache') {  
+		   dir('blueprints\linuxservers') {  
             script {
                 def plan = readFile "${BUILD_ID}_tfplan.txt"
                 input message: "Do you want to destroy the plan?",
@@ -97,7 +98,7 @@ pipeline {
     }
   stage('Terraform Destroy') {
       steps {
-		dir('azure-apache') {   
+		dir('blueprints\linuxservers') {   
 			sh "terraform workspace select azure_${BUILD_ID}_state"
 			sh "terraform destroy -input=false -auto-approve"
 		}
@@ -106,7 +107,7 @@ pipeline {
   }
   post {
         always {
-			dir('azure-apache') { 
+			dir('blueprints\linuxservers') { 
 				archiveArtifacts artifacts: "${BUILD_ID}_tfplan.txt"
 				cleanWs()
 			}
