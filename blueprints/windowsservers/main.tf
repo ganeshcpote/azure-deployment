@@ -2,7 +2,7 @@ provider "azurerm" {
    environment = "public"
    features {}
 }
- module "linuxservers" {
+ module "windowsservers" {
     source              	= "../../module/azure/vm/azurerm"
 	create_resource_group   = false
     resource_group_name 	= "CMP"
@@ -11,14 +11,15 @@ provider "azurerm" {
 	azure_client_secret		= "VdgxkF~M3-Kl004gGOdc1SS7a-q4kC.Lkh"
 	azure_tenant_id			= "98f13429-d038-4e5e-85d8-846c6a963288"
     location            	= "westus2"
-    vm_hostname         	= "mylinuxvm"
+    vm_hostname         	= "mywinvm"
+	admin_password      	= "ComplxP@ssw0rd!"
     nb_public_ip        	= "0"
-    remote_port         	= "22"
+    remote_port         	= "3389"
     nb_instances        	= "2"
-    vm_os_publisher     	= "Canonical"
-    vm_os_offer         	= "UbuntuServer"
-    vm_os_sku           	= "14.04.2-LTS"
-	vm_size					= "Standard_DS1_V2"
+    vm_os_publisher     	= "MicrosoftWindowsServer"
+    vm_os_offer         	= "WindowsServer"
+    vm_os_sku           	= "2012-R2-Datacenter"
+	vm_size             	= "Standard_DS2_V2"
     vnet_subnet_id      	= "/subscriptions/e24e76dc-df5a-4add-b57b-6aa3f0eae0ee/resourceGroups/CMP/providers/Microsoft.Network/virtualNetworks/CMP-vnet/subnets/default"
     boot_diagnostics    	= "true"
     delete_os_disk_on_termination = "true"

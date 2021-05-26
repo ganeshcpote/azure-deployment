@@ -3,8 +3,8 @@ pipeline {
 
   parameters {
         string(name: 'run_id', defaultValue: 'test1', description: 'Please specify run_id')
-	string(name: 'blueprint_name', defaultValue: 'linuxservers', description: 'Provide blueprint name for provisioning') 
-	string(name: 'user_email', defaultValue: 'ganesh.pote@ril.com', description: 'Provide user email Id for notification') 
+		choice(name: 'blueprint_name', choices: ['linuxservers', 'windowsservers'], description: 'Provide blueprint name for provisioning' )
+		string(name: 'user_email', defaultValue: 'ganesh.pote@ril.com', description: 'Provide user email Id for notification') 
     }
   stages {
     stage('Terraform Init') {
@@ -38,18 +38,10 @@ pipeline {
 			sh "echo ***********************************"
 
 			script{
-				vnet_id = sh(returnStdout: true, script: 'terraform output -raw vnet_id').trim()
-				subnet_id = sh(returnStdout: true, script: 'terraform output -raw subnet_id').trim()
-				virtual_network_name = sh(returnStdout: true, script: 'terraform output -raw virtual_network_name').trim()
-				private_ip_address = sh(returnStdout: true, script: 'terraform output -raw private_ip_address').trim()
-				security_group_id = sh(returnStdout: true, script: 'terraform output -raw security_group_id').trim()
-				security_group_name = sh(returnStdout: true, script: 'terraform output -raw security_group_name').trim()
-				resource_group_name = sh(returnStdout: true, script: 'terraform output -raw resource_group_name').trim()
-				public_ip_address = sh(returnStdout: true, script: 'terraform output -raw public_ip_address').trim()
-				vm_size = sh(returnStdout: true, script: 'terraform output -raw vm_size').trim()
-				vm_location = sh(returnStdout: true, script: 'terraform output -raw vm_location').trim()
-				vm_id = sh(returnStdout: true, script: 'terraform output -raw vm_id').trim()
-				application_url = sh(returnStdout: true, script: 'terraform output -raw application_url').trim()
+				vm_ids = sh(returnStdout: true, script: 'terraform output -raw vm_ids').trim()
+				network_interface_ids = sh(returnStdout: true, script: 'terraform output -raw network_interface_ids').trim()
+				network_interface_private_ip = sh(returnStdout: true, script: 'terraform output -raw network_interface_private_ip').trim()
+				availability_set_id = sh(returnStdout: true, script: 'terraform output -raw availability_set_id').trim()
 			}
 		}
       }
@@ -63,18 +55,10 @@ pipeline {
 			html_body = html_body + "<table>"
 			html_body = html_body + "<tr><td>Deployment ID:</td><td>${BUILD_ID}</td></tr>"
 			html_body = html_body + "<tr><td>Cloud Provider:</td><td>Azure</td></tr>"
-			html_body = html_body + "<tr><td>VNET ID:</td><td>${vnet_id}</td></tr>"
-			html_body = html_body + "<tr><td>Application Url:</td><td>${application_url}</td></tr>"
-			html_body = html_body + "<tr><td>Subnet ID:</td><td>${subnet_id}</td></tr>"
-			html_body = html_body + "<tr><td>Vitual Network Name :</td><td>${virtual_network_name}</td></tr>"
-			html_body = html_body + "<tr><td>Private IP:</td><td>${private_ip_address}</td></tr>"
-			html_body = html_body + "<tr><td>Security Group ID:</td><td>${security_group_id}</td></tr>"
-			html_body = html_body + "<tr><td>Security Group Name:</td><td>${security_group_name}</td></tr>"
-			html_body = html_body + "<tr><td>Resource Group Name:</td><td>${resource_group_name}</td></tr>"			
-			html_body = html_body + "<tr><td>Public IP:</td><td>${public_ip_address}</td></tr>"
-			html_body = html_body + "<tr><td>VM Size:</td><td>${vm_size}</td></tr>"		
-			html_body = html_body + "<tr><td>VM Location:</td><td>${vm_location}</td></tr>"		
-			html_body = html_body + "<tr><td>VM Instance ID:</td><td>${vm_id}</td></tr>"
+			html_body = html_body + "<tr><td>VM Ids:</td><td>${vm_ids}</td></tr>"
+			html_body = html_body + "<tr><td>Network Interface Ids:</td><td>${network_interface_ids}</td></tr>"
+			html_body = html_body + "<tr><td>Network Interface Private IP:</td><td>${network_interface_private_ip}</td></tr>"
+			html_body = html_body + "<tr><td>Availability Set Id:</td><td>${availability_set_id}</td></tr>"
 			html_body = html_body + "</table>"
 			html_body = html_body + "<br/><br/>Thanks, </br>Cloud Deployment Team"
 		}
