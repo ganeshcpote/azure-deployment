@@ -8,6 +8,7 @@ provider "azurerm" {
 
 locals {
   resource_group_name = element(coalescelist(data.azurerm_resource_group.rgrp.*.name, azurerm_resource_group.vm.*.name, [""]), 0)
+  location            = element(coalescelist(data.azurerm_resource_group.rgrp.*.location, azurerm_resource_group.vm.*.location, [""]), 0)
 }
 
 module "os" {
@@ -39,8 +40,8 @@ resource "random_id" "vm-sa" {
 resource "azurerm_storage_account" "vm-sa" {
   count                    = "${var.boot_diagnostics == "true" ? 1 : 0}"
   name                     = "bootdiag${lower(random_id.vm-sa.hex)}"
-  resource_group_name      = "${azurerm_resource_group.vm.name}"
-  location                 = "${var.location}"
+  resource_group_name      = local.resource_group_name
+  location                 = local.location
   account_tier             = "${element(split("_", var.boot_diagnostics_sa_type),0)}"
   account_replication_type = "${element(split("_", var.boot_diagnostics_sa_type),1)}"
   tags                     = "${var.tags}"
@@ -49,8 +50,8 @@ resource "azurerm_storage_account" "vm-sa" {
 resource "azurerm_virtual_machine" "vm-linux" {
   count                         = "${!contains(tolist(["${var.vm_os_simple}","${var.vm_os_offer}"]), "WindowsServer") && var.is_windows_image != "true" && var.data_disk == "false" ? var.nb_instances : 0}"
   name                          = "${var.vm_hostname}${count.index}"
-  location                      = "${var.location}"
-  resource_group_name           = "${azurerm_resource_group.vm.name}"
+  location                      = local.location
+  resource_group_name           = local.resource_group_name
   availability_set_id           = "${azurerm_availability_set.vm.id}"
   vm_size                       = "${var.vm_size}"
   network_interface_ids         = ["${element(azurerm_network_interface.vm.*.id, count.index)}"]
@@ -97,8 +98,8 @@ resource "azurerm_virtual_machine" "vm-linux" {
 resource "azurerm_virtual_machine" "vm-linux-with-datadisk" {
   count                         = "${!contains(tolist(["${var.vm_os_simple}","${var.vm_os_offer}"]), "WindowsServer")  && var.is_windows_image != "true"  && var.data_disk == "true" ? var.nb_instances : 0}"
   name                          = "${var.vm_hostname}${count.index}"
-  location                      = "${var.location}"
-  resource_group_name           = "${azurerm_resource_group.vm.name}"
+  location                      = local.location
+  resource_group_name           = local.resource_group_name
   availability_set_id           = "${azurerm_availability_set.vm.id}"
   vm_size                       = "${var.vm_size}"
   network_interface_ids         = ["${element(azurerm_network_interface.vm.*.id, count.index)}"]
@@ -153,8 +154,8 @@ resource "azurerm_virtual_machine" "vm-linux-with-datadisk" {
 resource "azurerm_virtual_machine" "vm-windows" {
   count                         = "${(((var.vm_os_id != "" && var.is_windows_image == "true") || contains(tolist(["${var.vm_os_simple}","${var.vm_os_offer}"]), "WindowsServer")) && var.data_disk == "false") ? var.nb_instances : 0}"
   name                          = "${var.vm_hostname}${count.index}"
-  location                      = "${var.location}"
-  resource_group_name           = "${azurerm_resource_group.vm.name}"
+  location                      = local.location
+  resource_group_name           = local.resource_group_name
   availability_set_id           = "${azurerm_availability_set.vm.id}"
   vm_size                       = "${var.vm_size}"
   network_interface_ids         = ["${element(azurerm_network_interface.vm.*.id, count.index)}"]
@@ -194,8 +195,8 @@ resource "azurerm_virtual_machine" "vm-windows" {
 resource "azurerm_virtual_machine" "vm-windows-with-datadisk" {
   count                         = "${((var.vm_os_id != "" && var.is_windows_image == "true") || contains(tolist(["${var.vm_os_simple}","${var.vm_os_offer}"]), "WindowsServer")) && var.data_disk == "true" ? var.nb_instances : 0}"
   name                          = "${var.vm_hostname}${count.index}"
-  location                      = "${var.location}"
-  resource_group_name           = "${azurerm_resource_group.vm.name}"
+  location                      = local.location
+  resource_group_name           = local.resource_group_name
   availability_set_id           = "${azurerm_availability_set.vm.id}"
   vm_size                       = "${var.vm_size}"
   network_interface_ids         = ["${element(azurerm_network_interface.vm.*.id, count.index)}"]
@@ -242,8 +243,8 @@ resource "azurerm_virtual_machine" "vm-windows-with-datadisk" {
 
 resource "azurerm_availability_set" "vm" {
   name                         = "${var.vm_hostname}-avset"
-  location                     = "${azurerm_resource_group.vm.location}"
-  resource_group_name          = "${azurerm_resource_group.vm.name}"
+  location                     = local.location
+  resource_group_name          = local.resource_group_name
   platform_fault_domain_count  = 2
   platform_update_domain_count = 2
   managed                      = true
@@ -252,8 +253,8 @@ resource "azurerm_availability_set" "vm" {
 resource "azurerm_public_ip" "vm" {
   count                        = "${var.nb_public_ip}"
   name                         = "${var.vm_hostname}-${count.index}-publicIP"
-  location                     = "${var.location}"
-  resource_group_name          = "${azurerm_resource_group.vm.name}"
+  location                     = local.location
+  resource_group_name          = local.resource_group_name
   allocation_method 		   = "${var.public_ip_address_allocation}"
   domain_name_label            = "${element(var.public_ip_dns, count.index)}"
 }
@@ -261,8 +262,8 @@ resource "azurerm_public_ip" "vm" {
 resource "azurerm_network_interface" "vm" {
   count                     = "${var.nb_instances}"
   name                      = "nic-${var.vm_hostname}-${count.index}"
-  location                  = "${azurerm_resource_group.vm.location}"
-  resource_group_name       = "${azurerm_resource_group.vm.name}"
+  location                  = local.location
+  resource_group_name       = local.resource_group_name
   #network_security_group_id = "${var.nsg_id}"
 
   ip_configuration {
