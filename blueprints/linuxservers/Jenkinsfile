@@ -11,8 +11,8 @@ pipeline {
       steps {
 	dir('blueprints/linuxservers') {  
 		sh "terraform init -backend-config=\"conn_str=postgres://jenkins:jenkins@localhost/terraformstate?sslmode=disable\" -input=false"
-		sh "terraform workspace new azure_${BUILD_ID}_state"
-		sh "terraform workspace select  azure_${BUILD_ID}_state"
+		sh "terraform workspace new blueprint_provisioning_${BUILD_ID}_state"
+		sh "terraform workspace select  blueprint_provisioning_${BUILD_ID}_state"
 		sh "terraform workspace show"
 		sh "terraform state pull"
 	  }
@@ -99,7 +99,7 @@ pipeline {
   stage('Terraform Destroy') {
       steps {
 		dir('blueprints/linuxservers') {   
-			sh "terraform workspace select azure_${BUILD_ID}_state"
+			sh "terraform workspace select blueprint_provisioning_${BUILD_ID}_state"
 			sh "terraform destroy -input=false -auto-approve"
 		}
       }
