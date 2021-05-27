@@ -93,7 +93,7 @@ pipeline {
         always {
 			dir("blueprints/${blueprint_name}") { 
 				archiveArtifacts artifacts: "${BUILD_ID}_tfplan.txt"
-				cleanWs()
+				//cleanWs()
 			}
         }
     }
