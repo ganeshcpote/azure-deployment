@@ -76,7 +76,7 @@ resource "azurerm_virtual_machine" "vm-linux" {
     computer_name  = "${var.vm_hostname}${count.index}"
     admin_username = "${var.admin_username}"
     admin_password = "${var.admin_password}"
-	custom_data    = var.application_blueprint ? file("shell/${var.blueprint_name}.sh") : null
+	custom_data    = var.application_blueprint ? file("${var.blueprint_name}.sh") : null
   }
 
   os_profile_linux_config {
