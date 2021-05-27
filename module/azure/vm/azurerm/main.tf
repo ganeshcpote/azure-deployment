@@ -275,8 +275,11 @@ resource "azurerm_network_interface" "vm" {
   }
 }
 
+resource "random_uuid" "uuid" {
+}
+
 resource "azurerm_network_security_group" "azure-nsg" {
-  name 				  = "sg-${var.vm_hostname}-${count.index}"
+  name 				  = "sg-${random_uuid.uuid.result}"
   location            = local.location
   resource_group_name = local.resource_group_name
 }
