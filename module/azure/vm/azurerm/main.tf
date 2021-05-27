@@ -275,22 +275,31 @@ resource "azurerm_network_interface" "vm" {
   }
 }
 
-resource "azurerm_network_security_rule" "azure-nsg" {
-  count 					 = "${length(var.inbound_port_ranges)}"
-  name                       = "sg-rule-${count.index}"
-  direction                  = "Inbound"
-  access                     = "Allow"
-  priority                   = "${(100 * (count.index + 1))}"
-  source_address_prefix      = "*"
-  source_port_range          = "*"
-  destination_address_prefix = "*"
-  destination_port_range     = "${element(var.inbound_port_ranges, count.index)}"
-  protocol                   = "TCP"
-  resource_group_name		 = local.resource_group_name
+resource "azurerm_network_security_group" "azure-nsg" {
+  count               = "${var.nb_instances}"
+  name 				  = "sg-${var.vm_hostname}-${count.index}"
+  location            = local.location
+  resource_group_name = local.resource_group_name
+}
+ 
+ 
+resource "azurerm_network_security_rule" "azure-security-rule" {
+  count 					 	= "${length(var.inbound_port_ranges)}"
+  name                       	= "sg-rule-${count.index}"
+  direction                  	= "Inbound"
+  access                     	= "Allow"
+  priority                   	= "${(100 * (count.index + 1))}"
+  source_address_prefix      	= "*"
+  source_port_range          	= "*"
+  destination_address_prefix 	= "*"
+  destination_port_range     	= "${element(var.inbound_port_ranges, count.index)}"
+  protocol                   	= "TCP"
+  resource_group_name		 	= local.resource_group_name
+  network_security_group_name 	= azurerm_network_security_group.azure-nsg.name
 }
 
 resource "azurerm_subnet_network_security_group_association" "azure-nsg-association" {
   count 					 	= "${length(var.inbound_port_ranges)}"
   subnet_id 					= "${var.vnet_subnet_id}"
-  network_security_group_id 	= "${length(azurerm_network_security_rule.azure-nsg.*.id) > 0 ? element(concat(azurerm_network_security_rule.azure-nsg.*.id, tolist([""])), count.index) : ""}"
+  network_security_group_id 	= "${length(azurerm_network_security_rule.azure-security-rule.*.id) > 0 ? element(concat(azurerm_network_security_rule.azure-security-rule.*.id, tolist([""])), count.index) : ""}"
 }
