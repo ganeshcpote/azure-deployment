@@ -288,9 +288,8 @@ resource "azurerm_network_security_rule" "azure-nsg" {
   protocol                   = "TCP"
 }
 
-#Associate the Web NSG with the subnet
 resource "azurerm_subnet_network_security_group_association" "azure-nsg-association" {
   count 					 	= "${length(var.inbound_port_ranges)}"
-  subnet_id 					= azurerm_subnet.azure-subnet.id
+  subnet_id 					= "${var.vnet_subnet_id}"
   network_security_group_id 	= "${length(azurerm_network_security_rule.azure-nsg.*.id) > 0 ? element(concat(azurerm_network_security_rule.azure-nsg.*.id, tolist([""])), count.index) : ""}"
 }
