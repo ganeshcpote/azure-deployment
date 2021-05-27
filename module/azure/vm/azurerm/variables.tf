@@ -54,9 +54,9 @@ variable "ssh_key" {
   default     = "~/.ssh/id_rsa.pub"
 }
 
-variable "remote_port" {
+variable "inbound_port_ranges" {
   description = "Remote tcp port to be used for access to the vms created via the nsg applied to the nics."
-  default     = ""
+  default     = [""]
 }
 
 variable "admin_username" {
@@ -167,4 +167,14 @@ variable "boot_diagnostics" {
 variable "boot_diagnostics_sa_type" {
   description = "(Optional) Storage account type for boot diagnostics"
   default     = "Standard_LRS"
+}
+
+variable "application_blueprint" {
+  description = "(Optional) Specify is this is application blueprint"
+  default     = "false"
+}
+
+variable "blueprint_name" {
+  description = "Blueprint name for the deployment"
+  default     = ""
 }

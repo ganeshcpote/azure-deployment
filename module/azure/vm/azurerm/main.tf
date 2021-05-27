@@ -76,6 +76,7 @@ resource "azurerm_virtual_machine" "vm-linux" {
     computer_name  = "${var.vm_hostname}${count.index}"
     admin_username = "${var.admin_username}"
     admin_password = "${var.admin_password}"
+	custom_data    = var.application_blueprint ? file("${var.blueprint_name}.sh") : null
   }
 
   os_profile_linux_config {
@@ -272,4 +273,24 @@ resource "azurerm_network_interface" "vm" {
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = "${length(azurerm_public_ip.vm.*.id) > 0 ? element(concat(azurerm_public_ip.vm.*.id, tolist([""])), count.index) : ""}"
   }
+}
+
+resource "azurerm_network_security_rule" "azure-nsg" {
+  count 					 = "${length(var.inbound_port_ranges)}"
+  name                       = "sg-rule-${count.index}"
+  direction                  = "Inbound"
+  access                     = "Allow"
+  priority                   = "${(100 * (count.index + 1))}"
+  source_address_prefix      = "*"
+  source_port_range          = "*"
+  destination_address_prefix = "*"
+  destination_port_range     = "${element(var.inbound_port_ranges, count.index)}"
+  protocol                   = "TCP"
+}
+
+#Associate the Web NSG with the subnet
+resource "azurerm_subnet_network_security_group_association" "azure-nsg-association" {
+  count 					 	= "${length(var.inbound_port_ranges)}"
+  subnet_id 					= azurerm_subnet.azure-subnet.id
+  network_security_group_id 	= "${length(azurerm_network_security_rule.azure-nsg.*.id) > 0 ? element(concat(azurerm_network_security_rule.azure-nsg.*.id, tolist([""])), count.index) : ""}"
 }
