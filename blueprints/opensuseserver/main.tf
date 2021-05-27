@@ -15,7 +15,7 @@ provider "azurerm" {
 	admin_username			= "azureuser"
 	admin_password      	= "ComplxP@ssw0rd!"
     nb_public_ip        	= "0"
-    remote_port         	= "22"
+    inbound_port_ranges     = ["22"]
     nb_instances        	= "2"
     vm_os_publisher     	= "SUSE"
     vm_os_offer         	= "openSUSE-Leap"

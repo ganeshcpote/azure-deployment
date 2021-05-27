@@ -15,7 +15,7 @@ provider "azurerm" {
 	admin_username			= "azureuser"
 	admin_password      	= "ComplxP@ssw0rd!"
     nb_public_ip        	= "0"
-    remote_port         	= "3389"
+    inbound_port_ranges     = ["3389"]
     nb_instances        	= "2"
     vm_os_publisher     	= "MicrosoftWindowsServer"
     vm_os_offer         	= "WindowsServer"

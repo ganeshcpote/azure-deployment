@@ -2,7 +2,7 @@ provider "azurerm" {
    environment = "public"
    features {}
 }
- module "coreosserver" {
+ module "ubuntuapache2server" {
     source              	= "../../module/azure/vm/azurerm"
 	create_resource_group   = false
     resource_group_name 	= "CMP"
@@ -15,11 +15,13 @@ provider "azurerm" {
 	admin_username			= "azureuser"
 	admin_password      	= "ComplxP@ssw0rd!"
     nb_public_ip        	= "0"
-    inbound_port_ranges     = ["22"]
-    nb_instances        	= "2"
-    vm_os_publisher     	= "CoreOS"
-    vm_os_offer         	= "CoreOS"
-    vm_os_sku           	= "Stable"
+    inbound_port_ranges     = ["22","80"]
+	application_blueprint	= "true"
+	blueprint_name			= "ubuntuapache2server"
+    nb_instances        	= "1"
+    vm_os_publisher     	= "Canonical"
+    vm_os_offer         	= "UbuntuServer"
+    vm_os_sku           	= "14.04.2-LTS"
 	vm_os_version			= "latest"
 	vm_size					= "Standard_DS1_V2"
     vnet_subnet_id      	= "/subscriptions/e24e76dc-df5a-4add-b57b-6aa3f0eae0ee/resourceGroups/CMP/providers/Microsoft.Network/virtualNetworks/CMP-vnet/subnets/default"
