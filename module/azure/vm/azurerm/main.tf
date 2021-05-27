@@ -300,8 +300,9 @@ resource "azurerm_network_security_rule" "azure-security-rule" {
   network_security_group_name 	= azurerm_network_security_group.azure-nsg.name
 }
 
-resource "azurerm_subnet_network_security_group_association" "azure-nsg-association" {
-  count 					 	= "${length(var.inbound_port_ranges)}"
-  subnet_id 					= "${var.vnet_subnet_id}"
-  network_security_group_id 	= azurerm_network_security_group.azure-nsg.id
-}
+# TODO : This need to import existing subnet state into statefile and without that it is not working.
+#resource "azurerm_subnet_network_security_group_association" "azure-nsg-association" {
+#  subnet_id 					= "${var.vnet_subnet_id}"
+#  network_security_group_id 	= azurerm_network_security_group.azure-nsg.id
+#}
+
