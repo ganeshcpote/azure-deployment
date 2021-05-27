@@ -303,5 +303,5 @@ resource "azurerm_network_security_rule" "azure-security-rule" {
 resource "azurerm_subnet_network_security_group_association" "azure-nsg-association" {
   count 					 	= "${length(var.inbound_port_ranges)}"
   subnet_id 					= "${var.vnet_subnet_id}"
-  network_security_group_id 	= "${length(azurerm_network_security_rule.azure-security-rule.*.id) > 0 ? element(concat(azurerm_network_security_rule.azure-security-rule.*.id, tolist([""])), count.index) : ""}"
+  network_security_group_id 	= azurerm_network_security_group.azure-nsg.id
 }
