@@ -14,7 +14,7 @@ provider "azurerm" {
     vm_hostname         	= "mylinuxvm"
 	admin_username			= "azureuser"
 	admin_password      	= "ComplxP@ssw0rd!"
-    nb_public_ip        	= "1"
+    nb_public_ip        	= "0"
     inbound_port_ranges     = ["22","80"]
 	application_blueprint	= "true"
 	blueprint_name			= "ubuntuapache2server"
