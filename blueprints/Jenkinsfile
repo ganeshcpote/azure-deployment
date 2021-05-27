@@ -3,7 +3,7 @@ pipeline {
 
   parameters {
         string(name: 'run_id', defaultValue: 'test1', description: 'Please specify run_id')
-		choice(name: 'blueprint_name', choices: ['linuxservers', 'windowsservers'], description: 'Provide blueprint name for provisioning' )
+		choice(name: 'blueprint_name', choices: ['centosserver', 'coreosserver', 'debianserver', 'opensuseserver', 'suseserver', 'ubuntuserver', 'win2016server', 'win2021server'], description: 'Provide blueprint name for provisioning' )
 		string(name: 'user_email', defaultValue: 'ganesh.pote@ril.com', description: 'Provide user email Id for notification') 
     }
   stages {

@@ -2,7 +2,7 @@ provider "azurerm" {
    environment = "public"
    features {}
 }
- module "windowsservers" {
+ module "win2021server" {
     source              	= "../../module/azure/vm/azurerm"
 	create_resource_group   = false
     resource_group_name 	= "CMP"
@@ -12,6 +12,7 @@ provider "azurerm" {
 	azure_tenant_id			= "98f13429-d038-4e5e-85d8-846c6a963288"
     location            	= "westus2"
     vm_hostname         	= "mywinvm"
+	admin_username			= "azureuser"
 	admin_password      	= "ComplxP@ssw0rd!"
     nb_public_ip        	= "0"
     remote_port         	= "3389"
@@ -19,6 +20,7 @@ provider "azurerm" {
     vm_os_publisher     	= "MicrosoftWindowsServer"
     vm_os_offer         	= "WindowsServer"
     vm_os_sku           	= "2012-R2-Datacenter"
+	vm_os_version			= "latest"
 	vm_size             	= "Standard_DS2_V2"
     vnet_subnet_id      	= "/subscriptions/e24e76dc-df5a-4add-b57b-6aa3f0eae0ee/resourceGroups/CMP/providers/Microsoft.Network/virtualNetworks/CMP-vnet/subnets/default"
     boot_diagnostics    	= "true"
