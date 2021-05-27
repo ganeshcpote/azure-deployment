@@ -286,6 +286,7 @@ resource "azurerm_network_security_rule" "azure-nsg" {
   destination_address_prefix = "*"
   destination_port_range     = "${element(var.inbound_port_ranges, count.index)}"
   protocol                   = "TCP"
+  resource_group_name		 = local.resource_group_name
 }
 
 resource "azurerm_subnet_network_security_group_association" "azure-nsg-association" {
