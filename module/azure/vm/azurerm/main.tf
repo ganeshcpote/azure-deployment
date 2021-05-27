@@ -276,7 +276,6 @@ resource "azurerm_network_interface" "vm" {
 }
 
 resource "azurerm_network_security_group" "azure-nsg" {
-  count               = "${var.nb_instances}"
   name 				  = "sg-${var.vm_hostname}-${count.index}"
   location            = local.location
   resource_group_name = local.resource_group_name
