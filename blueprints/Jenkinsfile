@@ -4,7 +4,10 @@ pipeline {
   parameters {
         string(name: 'run_id', defaultValue: 'test1', description: 'Please specify run_id')
 		choice(name: 'blueprint_name', choices: ['centosserver', 'coreosserver', 'debianserver', 'opensuseserver', 'suseserver', 'ubuntuserver', 'win2016server', 'win2021server', 'ubuntuapache2server'], description: 'Provide blueprint name for provisioning' )
+		booleanParam(name: 'application_blueprint', defaultValue: 'false', description: 'Please specify if this is application blueprint')
 		string(name: 'resource_group_name', defaultValue: 'CMP', description: 'Please Azure Resource Group Name')
+		string(name: 'vm_hostname', defaultValue: 'mycentonserver', description: 'Please host name for VM')
+		string(name: 'vm_size', defaultValue: 'Standard_DS1_V2', description: 'Please size of VM')
 		string(name: 'azure_subscription_id', defaultValue: 'e24e76dc-df5a-4add-b57b-6aa3f0eae0ee', description: 'Please specify Azure Subscription ID')
 		string(name: 'azure_client_id', defaultValue: '49dc5041-2873-4ee7-9a05-33723de63dbf', description: 'Please specify Azure Client ID')
 		string(name: 'azure_client_secret', defaultValue: 'VdgxkF~M3-Kl004gGOdc1SS7a-q4kC.Lkh', description: 'Please specify Azure Client secret')
@@ -31,6 +34,9 @@ pipeline {
 		replace_variable("vnet_subnet_id", "${vnet_subnet_id}")
 		replace_variable("data_disk", "${data_disk}")
 		replace_variable("data_disk_size_gb", "${data_disk_size_gb}")
+		replace_variable("vm_hostname", "${vm_hostname}")
+		replace_variable("application_blueprint", "${application_blueprint}")
+		replace_variable("vm_size", "${vm_size}")
 		sh "cat main.tf"
 	  }
        }
