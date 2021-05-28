@@ -167,7 +167,7 @@ def replace_tags(txt){
 	def lazyMap = new groovy.json.JsonSlurper().parseText(txt)
 	def map = [:]
 	for ( prop in lazyMap ) {
-    	map[prop.key] = prop.value
+    	map[prop.key] = '"' + prop.value + '"'
 	}
 	println map
 	def text = readFile file: "main.tf"
