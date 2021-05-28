@@ -32,7 +32,6 @@ pipeline {
 		replace_variable("data_disk", "${data_disk}")
 		replace_variable("data_disk_size_gb", "${data_disk_size_gb}")
 		sh "cat main.tf"
-		sh "exit 1"
 	  }
        }
     }
