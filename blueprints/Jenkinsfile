@@ -169,6 +169,8 @@ def replace_tags(txt){
 	for ( prop in lazyMap ) {
     	map[prop.key] = '"' + prop.value + '"'
 	}
+	println map
+	println map.toString()
 	def tf_tags = map.toString().replaceAll(',', "")
 	println tf_tags
 	def text = readFile file: "main.tf"
