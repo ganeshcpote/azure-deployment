@@ -4,9 +4,37 @@ pipeline {
   parameters {
         string(name: 'run_id', defaultValue: 'test1', description: 'Please specify run_id')
 		choice(name: 'blueprint_name', choices: ['centosserver', 'coreosserver', 'debianserver', 'opensuseserver', 'suseserver', 'ubuntuserver', 'win2016server', 'win2021server', 'ubuntuapache2server'], description: 'Provide blueprint name for provisioning' )
+		string(name: 'resource_group_name', defaultValue: 'resource_group_name', description: 'Please Azure Resource Group Name')
+		string(name: 'azure_subscription_id', defaultValue: 'test1', description: 'Please specify Azure Subscription ID')
+		string(name: 'azure_client_id', defaultValue: 'test1', description: 'Please specify Azure Client ID')
+		string(name: 'azure_client_secret', defaultValue: 'test1', description: 'Please specify Azure Client secret')
+		string(name: 'azure_tenant_id', defaultValue: 'test1', description: 'Please specify Azure Tenant ID')
+		string(name: 'location', defaultValue: 'test1', description: 'Please specify Azure location')
+		string(name: 'nb_instances', defaultValue: 'test1', description: 'Please specify no. of instance to be deployed on Cloud')
+		string(name: 'vnet_subnet_id', defaultValue: 'test1', description: 'Please specify Azure Subnet ID')
+		string(name: 'data_disk', defaultValue: 'test1', description: 'Please specify if you wish to add additonal persistent storage')
+		string(name: 'data_disk_size_gb', defaultValue: 'test1', description: 'Please specify additonal persistent storage size in GB')
 		string(name: 'user_email', defaultValue: 'ganesh.pote@ril.com', description: 'Provide user email Id for notification') 
     }
   stages {
+	stage('Terraform Preparation') {
+      steps {
+	dir("blueprints/${blueprint_name}") {  
+		replace_variable("resource_group_name", "${resource_group_name}")
+		replace_variable("azure_subscription_id", "${azure_subscription_id}")
+		replace_variable("azure_client_id", "${azure_client_id}")
+		replace_variable("azure_client_secret", "${azure_client_secret}")
+		replace_variable("azure_tenant_id", "${azure_tenant_id}")
+		replace_variable("location", "${location}")
+		replace_variable("nb_instances", "${nb_instances}")
+		replace_variable("vnet_subnet_id", "${vnet_subnet_id}")
+		replace_variable("data_disk", "${data_disk}")
+		replace_variable("data_disk_size_gb", "${data_disk_size_gb}")
+		sh "cat main.tf"
+		sh "exit 1"
+	  }
+       }
+    }
     stage('Terraform Init') {
       steps {
 	dir("blueprints/${blueprint_name}") {  
@@ -97,4 +125,10 @@ pipeline {
 			}
         }
     }
+}
+
+def replace_variable(String oldText, String newText) {
+	def text = readFile file: "main.tf"
+	text = text.replaceAll("%${oldText}%", "${newText}")
+	writeFile file: "main.tf", text: text
 }
