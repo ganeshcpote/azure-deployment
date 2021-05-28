@@ -86,6 +86,21 @@ pipeline {
 			}
 		}
       }
+	  post {
+		failure {
+			echo 'FAILED (in Terraform Apply stage - should not happen :))'
+			script {
+                def plan = readFile "${BUILD_ID}_tfplan.txt"
+                input message: "Do you want to destroy the plan to rollback incomplete provisioning resources?",
+                    parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+				dir("blueprints/${blueprint_name}") {
+					sh "terraform workspace select blueprint_provisioning_${BUILD_ID}_state"
+					sh "terraform destroy -input=false -auto-approve"
+				}
+            }
+		}
+	  }
+
     }
   stage('Send Email') {
 	  when {
