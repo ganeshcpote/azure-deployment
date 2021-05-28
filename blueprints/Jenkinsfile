@@ -38,8 +38,7 @@ pipeline {
 		replace_variable("vm_hostname", "${vm_hostname}")
 		replace_variable("application_blueprint", "${application_blueprint}")
 		replace_variable("vm_size", "${vm_size}")
-		cloud_tags = add_tags("${tags}")
-		replace_variable("tags", "${cloud_tags}")
+		replace_tags("${tags}")
 		sh "cat main.tf"
 	  }
        }
@@ -163,11 +162,13 @@ def replace_variable(String oldText, String newText) {
 }
 
 
-def add_tags(txt){
+def replace_tags(txt){
 	def lazyMap = new groovy.json.JsonSlurper().parseText(txt)
 	def map = [:]
 	for ( prop in lazyMap ) {
     	map[prop.key] = prop.value
 	}
-	return map;
+	def text = readFile file: "main.tf"
+	text = text.replaceAll("%${tags}%", map)
+	writeFile file: "main.tf", text: text
 }
