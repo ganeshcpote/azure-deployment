@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   parameters {
-        string(name: 'run_id', defaultValue: 'test1', description: 'Please specify run_id')
+        string(name: 'deployment_id', defaultValue: 'test1', description: 'Please specify deployment id (UUID)')
 		choice(name: 'blueprint_name', choices: ['centosserver', 'coreosserver', 'debianserver', 'opensuseserver', 'suseserver', 'ubuntuserver', 'win2016server', 'win2021server', 'ubuntuapache2server'], description: 'Provide blueprint name for provisioning' )
 		booleanParam(name: 'application_blueprint', defaultValue: 'false', description: 'Please specify if this is application blueprint')
 		string(name: 'resource_group_name', defaultValue: 'CMP', description: 'Please Azure Resource Group Name')
@@ -17,6 +17,7 @@ pipeline {
 		string(name: 'vnet_subnet_id', defaultValue: '/subscriptions/e24e76dc-df5a-4add-b57b-6aa3f0eae0ee/resourceGroups/CMP/providers/Microsoft.Network/virtualNetworks/CMP-vnet/subnets/default', description: 'Please specify Azure Subnet ID')
 		booleanParam(name: 'data_disk', defaultValue: 'true', description: 'Please specify if you wish to add additonal persistent storage')
 		string(name: 'data_disk_size_gb', defaultValue: '64', description: 'Please specify additonal persistent storage size in GB')
+		string(name: 'tags', defaultValue: '{"environment":"dev","costcenter":"it"}', description: 'Please specify tags to apply to resources')
 		string(name: 'user_email', defaultValue: 'ganesh.pote@ril.com', description: 'Provide user email Id for notification') 
 		booleanParam(name: 'hcmp_run', defaultValue: 'false', description: 'Please specify if this is test run')
     }
@@ -37,6 +38,7 @@ pipeline {
 		replace_variable("vm_hostname", "${vm_hostname}")
 		replace_variable("application_blueprint", "${application_blueprint}")
 		replace_variable("vm_size", "${vm_size}")
+		add_tags("${tags}")
 		sh "cat main.tf"
 	  }
        }
@@ -157,4 +159,15 @@ def replace_variable(String oldText, String newText) {
 	def text = readFile file: "main.tf"
 	text = text.replaceAll("%${oldText}%", "${newText}")
 	writeFile file: "main.tf", text: text
+}
+
+
+def add_tags(txt){
+	def lazyMap = new groovy.json.JsonSlurper().parseText(txt)
+	def map = [:]
+	for ( prop in lazyMap ) {
+    	map[prop.key] = prop.value
+	}
+	map[
+	return map;
 }
