@@ -29,8 +29,5 @@ provider "azurerm" {
     data_disk           	= "%data_disk%"
     data_disk_size_gb   	= "%data_disk_size_gb%"
     data_sa_type        	= "Premium_LRS"
-    tags                	= {
-								environment = "dev"
-								costcenter  = "it"
-							  }
+    tags                	= "%tags%"
   }
