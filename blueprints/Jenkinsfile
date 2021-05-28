@@ -19,7 +19,7 @@ pipeline {
 		string(name: 'data_disk_size_gb', defaultValue: '64', description: 'Please specify additonal persistent storage size in GB')
 		string(name: 'tags', defaultValue: '{"environment":"dev","costcenter":"it","deployement_id":"${BUILD_ID}"}', description: 'Please specify tags to apply to resources')
 		string(name: 'user_email', defaultValue: 'ganesh.pote@ril.com', description: 'Provide user email Id for notification') 
-		booleanParam(name: 'hcmp_run', defaultValue: 'true', description: 'Please specify if this is test run')
+		booleanParam(name: 'test_run', defaultValue: 'true', description: 'Please specify if this is test run')
     }
   stages {
 	stage('Terraform Preparation') {
@@ -65,7 +65,7 @@ pipeline {
    stage('Terraform Apply') {
       when {
 		expression {
-			return !params.hcmp_run
+			return !params.test_run
 		}
       }
       steps {
@@ -90,7 +90,7 @@ pipeline {
   stage('Send Email') {
 	  when {
 		expression {
-			return !params.hcmp_run
+			return !params.test_run
 		}
       }
       steps {
@@ -118,7 +118,7 @@ pipeline {
   stage('Terraform Destroy Approval') {
 	   when {
 		expression {
-			return !params.hcmp_run
+			return !params.test_run
 		}
       }
 	   steps {
@@ -134,7 +134,7 @@ pipeline {
   stage('Terraform Destroy') {
       when {
 		expression {
-			return !params.hcmp_run
+			return !params.test_run
 		}
       }
       steps {
