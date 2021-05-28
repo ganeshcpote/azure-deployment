@@ -173,9 +173,9 @@ def replace_tags(txt){
 	println map.toString()
 	def tf_tags = "{"
 	for(element in map) {
-		tf_tags = tf_tags + element
+		tf_tags.concat(element)
 	}
-	tf_tags = "}"
+	tf_tags.concat("}")
 	println tf_tags
 	def text = readFile file: "main.tf"
 	text = text.replaceAll("%${tags}%", tf_tags)
