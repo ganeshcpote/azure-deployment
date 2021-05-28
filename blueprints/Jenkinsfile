@@ -163,11 +163,13 @@ def replace_variable(String oldText, String newText) {
 
 
 def replace_tags(txt){
+	println txt
 	def lazyMap = new groovy.json.JsonSlurper().parseText(txt)
 	def map = [:]
 	for ( prop in lazyMap ) {
     	map[prop.key] = prop.value
 	}
+	println map
 	def text = readFile file: "main.tf"
 	text = text.replaceAll("%${tags}%", map)
 	writeFile file: "main.tf", text: text
