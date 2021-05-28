@@ -3,6 +3,7 @@ pipeline {
 
   parameters {
         string(name: 'deployment_id', defaultValue: 'test1', description: 'Please specify deployment id (UUID)')
+		choice(name: 'cloud_provider', choices: ['azure', 'gcp', 'aws'], description: 'Please specify Cloud Provide name')
 		choice(name: 'blueprint_name', choices: ['centosserver', 'coreosserver', 'debianserver', 'opensuseserver', 'suseserver', 'ubuntuserver', 'win2016server', 'win2021server', 'ubuntuapache2server'], description: 'Provide blueprint name for provisioning' )
 		booleanParam(name: 'application_blueprint', defaultValue: 'false', description: 'Please specify if this is application blueprint')
 		string(name: 'resource_group_name', defaultValue: 'CMP', description: 'Please Azure Resource Group Name')
@@ -20,6 +21,7 @@ pipeline {
 		string(name: 'tags', defaultValue: '{"environment":"dev","costcenter":"it","deployement_id":"${BUILD_ID}"}', description: 'Please specify tags to apply to resources')
 		string(name: 'user_email', defaultValue: 'ganesh.pote@ril.com', description: 'Provide user email Id for notification') 
 		booleanParam(name: 'test_run', defaultValue: 'true', description: 'Please specify if this is test run')
+		booleanParam(name: 'debug', defaultValue: 'true', description: 'Please specify if this is test run')
     }
   stages {
 	stage('Terraform Preparation') {
@@ -133,7 +135,7 @@ pipeline {
   stage('Terraform Destroy Approval') {
 	   when {
 		expression {
-			return !params.test_run
+			return !params.test_run || params.debug
 		}
       }
 	   steps {
@@ -149,7 +151,7 @@ pipeline {
   stage('Terraform Destroy') {
       when {
 		expression {
-			return !params.test_run
+			return !params.test_run || params.debug
 		}
       }
       steps {
