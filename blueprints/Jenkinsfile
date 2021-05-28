@@ -178,7 +178,5 @@ def replace_tags(txt){
 	tf_tags.append("}")
 	println tf_tags.toString()
 	
-	def text = readFile file: "main.tf"
-	text = text.replaceAll("%tags%", tf_tags.toString())
-	writeFile file: "main.tf", text: text
+	replace_variable("tags", tf_tags.toString())
 }
