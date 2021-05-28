@@ -177,5 +177,5 @@ def replace_tags(txt){
 	}
 	tf_tags.append("}")
 	println tf_tags.toString()
-	replace_variable("tags", tf_tags.toString())
+	replace_variable("tags", tf_tags)
 }
