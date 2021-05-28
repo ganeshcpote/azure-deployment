@@ -168,6 +168,5 @@ def add_tags(txt){
 	for ( prop in lazyMap ) {
     	map[prop.key] = prop.value
 	}
-	map[
 	return map;
 }
