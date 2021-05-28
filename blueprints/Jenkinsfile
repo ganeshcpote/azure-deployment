@@ -172,8 +172,8 @@ def replace_tags(txt){
 	println map
 	println map.toString()
 	def tf_tags = "{"
-	for(element in mymap) {
-		tf_tags = tf_tags + element
+	for(element in map) {
+		tf_tags = tf_tags + element.toString()
 	}
 	tf_tags = "}"
 	println tf_tags
