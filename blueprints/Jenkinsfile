@@ -173,7 +173,7 @@ def replace_tags(txt){
 	println map.toString()
 	def tf_tags = new StringBuilder().append("{")
 	for(element in map) {
-		tf_tags.append(element)
+		tf_tags.append(element).append("\n")
 	}
 	tf_tags.append("}")
 	println tf_tags
