@@ -17,7 +17,7 @@ pipeline {
 		string(name: 'vnet_subnet_id', defaultValue: '/subscriptions/e24e76dc-df5a-4add-b57b-6aa3f0eae0ee/resourceGroups/CMP/providers/Microsoft.Network/virtualNetworks/CMP-vnet/subnets/default', description: 'Please specify Azure Subnet ID')
 		booleanParam(name: 'data_disk', defaultValue: 'true', description: 'Please specify if you wish to add additonal persistent storage')
 		string(name: 'data_disk_size_gb', defaultValue: '64', description: 'Please specify additonal persistent storage size in GB')
-		string(name: 'tags', defaultValue: '{"environment":"dev","costcenter":"it"}', description: 'Please specify tags to apply to resources')
+		string(name: 'tags', defaultValue: '{"environment":"dev","costcenter":"it","deployement_id":"${BUILD_ID}"}', description: 'Please specify tags to apply to resources')
 		string(name: 'user_email', defaultValue: 'ganesh.pote@ril.com', description: 'Provide user email Id for notification') 
 		booleanParam(name: 'hcmp_run', defaultValue: 'false', description: 'Please specify if this is test run')
     }
