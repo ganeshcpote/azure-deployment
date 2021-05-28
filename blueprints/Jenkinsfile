@@ -38,7 +38,8 @@ pipeline {
 		replace_variable("vm_hostname", "${vm_hostname}")
 		replace_variable("application_blueprint", "${application_blueprint}")
 		replace_variable("vm_size", "${vm_size}")
-		add_tags("${tags}")
+		def cloud_tags = add_tags("${tags}")
+		replace_variable("tags", "${cloud_tags}")
 		sh "cat main.tf"
 	  }
        }
