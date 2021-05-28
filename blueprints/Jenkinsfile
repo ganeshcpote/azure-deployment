@@ -170,9 +170,12 @@ def replace_tags(txt){
     	map[prop.key] = '"' + prop.value + '"'
 	}
 	println map
-	println map.replaceAll(',', "").toString()
 	println map.toString()
-	def tf_tags = map.toString().replaceAll(',', "")
+	def tf_tags = "{"
+	for(element in mymap) {
+		tf_tags = tf_tags + element
+	}
+	tf_tags = "}"
 	println tf_tags
 	def text = readFile file: "main.tf"
 	text = text.replaceAll("%${tags}%", tf_tags)
