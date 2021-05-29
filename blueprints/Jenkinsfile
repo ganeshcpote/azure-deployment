@@ -19,7 +19,6 @@ pipeline {
 		booleanParam(name: 'data_disk', defaultValue: 'true', description: 'Please specify if you wish to add additonal persistent storage')
 		string(name: 'data_disk_size_gb', defaultValue: '64', description: 'Please specify additonal persistent storage size in GB')
 		string(name: 'tags', defaultValue: '{"environment":"dev","costcenter":"it","deployement_id":"${BUILD_ID}"}', description: 'Please specify tags to apply to resources')
-		string(name: 'user_email', defaultValue: 'ganesh.pote@ril.com', description: 'Provide user email Id for notification') 
 		booleanParam(name: 'test_run', defaultValue: 'true', description: 'Please specify if this is test run')
     }
   stages {
@@ -78,13 +77,6 @@ pipeline {
 			sh "echo ***********************************"
 			sh "terraform show -json"
 			sh "echo ***********************************"
-
-			script{
-				vm_ids = sh(returnStdout: true, script: 'terraform output -raw vm_ids').trim()
-				network_interface_ids = sh(returnStdout: true, script: 'terraform output -raw network_interface_ids').trim()
-				network_interface_private_ip = sh(returnStdout: true, script: 'terraform output -raw network_interface_private_ip').trim()
-				availability_set_id = sh(returnStdout: true, script: 'terraform output -raw availability_set_id').trim()
-			}
 		}
       }
 	  post {
@@ -103,34 +95,6 @@ pipeline {
 	  }
 
     }
-  stage('Send Email') {
-	  when {
-		expression {
-			return !params.test_run
-		}
-      }
-      steps {
-		script{
-			html_body = "Dear User, <br/><br/>" 
-			html_body = html_body + "Your request number <b> ${BUILD_ID} </b> has been approved and completed.<br/><br/>"
-			html_body = html_body + "Below are the provisioning details for your reference : <br/><br/>"
-			html_body = html_body + "<table>"
-			html_body = html_body + "<tr><td>Deployment ID:</td><td>${BUILD_ID}</td></tr>"
-			html_body = html_body + "<tr><td>Cloud Provider:</td><td>Azure</td></tr>"
-			html_body = html_body + "<tr><td>VM Ids:</td><td>${vm_ids}</td></tr>"
-			html_body = html_body + "<tr><td>Network Interface Ids:</td><td>${network_interface_ids}</td></tr>"
-			html_body = html_body + "<tr><td>Network Interface Private IP:</td><td>${network_interface_private_ip}</td></tr>"
-			html_body = html_body + "<tr><td>Availability Set Id:</td><td>${availability_set_id}</td></tr>"
-			html_body = html_body + "</table>"
-			html_body = html_body + "<br/><br/>Thanks, </br>Cloud Deployment Team"
-		}
-			mail	to: "${user_email}", 
-			from: 'jenkins@example.com',
-			mimeType: 'text/html',
-			subject: "Your Azure Cloud deployment request number \"${BUILD_ID}\" Status - Completed", 
-			body: html_body
-		  }
-  }
   stage('Terraform Destroy Approval') {
 	   when {
 		expression {
