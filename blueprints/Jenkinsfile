@@ -18,7 +18,7 @@ pipeline {
 		string(name: 'vnet_subnet_id', defaultValue: '/subscriptions/e24e76dc-df5a-4add-b57b-6aa3f0eae0ee/resourceGroups/CMP/providers/Microsoft.Network/virtualNetworks/CMP-vnet/subnets/default', description: 'Please specify Azure Subnet ID')
 		booleanParam(name: 'data_disk', defaultValue: 'true', description: 'Please specify if you wish to add additonal persistent storage')
 		string(name: 'data_disk_size_gb', defaultValue: '64', description: 'Please specify additonal persistent storage size in GB')
-		string(name: 'tags', defaultValue: '{"environment":"dev","costcenter":"it","deployement_id":"${BUILD_ID}"}', description: 'Please specify tags to apply to resources')
+		string(name: 'tags', defaultValue: '{"environment":"dev","costcenter":"it","deployement_id":"${deployment_id}"}', description: 'Please specify tags to apply to resources')
 		booleanParam(name: 'test_run', defaultValue: 'true', description: 'Please specify if this is test run')
     }
   stages {
@@ -46,9 +46,9 @@ pipeline {
     stage('Terraform Init') {
       steps {
 	dir("blueprints/${blueprint_name}") {  
-		sh "terraform init -backend-config=\"conn_str=postgres://jenkins:jenkins@localhost/terraformstate?sslmode=disable\" -input=false"
-		sh "terraform workspace new blueprint_provisioning_${BUILD_ID}_state"
-		sh "terraform workspace select  blueprint_provisioning_${BUILD_ID}_state"
+		sh "terraform init -backend-config=\"conn_str=postgres://hcmp:Hcmp@123@10.160.128.110/hcmp?sslmode=disable\" -input=false"
+		sh "terraform workspace new {deployment_id}_state"
+		sh "terraform workspace select  ${deployment_id}_state"
 		sh "terraform workspace show"
 		sh "terraform state pull"
 	  }
@@ -58,7 +58,7 @@ pipeline {
       steps {
 		dir("blueprints/${blueprint_name}") {   
 			sh "terraform plan -out=tfplan"
-			sh "terraform show -no-color tfplan > ${BUILD_ID}_tfplan.txt"
+			sh "terraform show -no-color tfplan > ${deployment_id}_tfplan.txt"
 		}
       }
     }
@@ -84,10 +84,10 @@ pipeline {
 			echo 'FAILED (in Terraform Apply stage - should not happen :))'
 			script {
 				dir("blueprints/${blueprint_name}") {
-					def plan = readFile "${BUILD_ID}_tfplan.txt"
+					def plan = readFile "${deployment_id}_tfplan.txt"
 					input message: "Do you want to destroy the plan to rollback incomplete provisioning resources?",
                     parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
-					sh "terraform workspace select blueprint_provisioning_${BUILD_ID}_state"
+					sh "terraform workspace select ${deployment_id}_state"
 					sh "terraform destroy -input=false -auto-approve"
 				}
             }
@@ -104,7 +104,7 @@ pipeline {
 	   steps {
 		   dir("blueprints/${blueprint_name}") {  
             script {
-                def plan = readFile "${BUILD_ID}_tfplan.txt"
+                def plan = readFile "${deployment_id}_tfplan.txt"
                 input message: "Do you want to destroy the plan?",
                     parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
             }
@@ -119,7 +119,7 @@ pipeline {
       }
       steps {
 		dir("blueprints/${blueprint_name}") {   
-			sh "terraform workspace select blueprint_provisioning_${BUILD_ID}_state"
+			sh "terraform workspace select ${deployment_id}_state"
 			sh "terraform destroy -input=false -auto-approve"
 		}
       }
@@ -128,7 +128,7 @@ pipeline {
   post {
         always {
 			dir("blueprints/${blueprint_name}") { 
-				archiveArtifacts artifacts: "${BUILD_ID}_tfplan.txt"
+				archiveArtifacts artifacts: "${deployment_id}_tfplan.txt"
 				//cleanWs()
 			}
         }
