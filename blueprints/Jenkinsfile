@@ -47,8 +47,8 @@ pipeline {
       steps {
 	dir("blueprints/${blueprint_name}") {  
 		sh "terraform init -backend-config=\"conn_str=postgres://jenkins:jenkins@localhost/terraformstate?sslmode=disable\" -input=false"
-		sh "terraform workspace new blueprint_provisioning_${BUILD_ID}_state"
-		sh "terraform workspace select  blueprint_provisioning_${BUILD_ID}_state"
+		sh "terraform workspace new ${deployment_id}"
+		sh "terraform workspace select  ${deployment_id}"
 		sh "terraform workspace show"
 		sh "terraform state pull"
 	  }
@@ -87,7 +87,7 @@ pipeline {
 					def plan = readFile "${BUILD_ID}_tfplan.txt"
 					input message: "Do you want to destroy the plan to rollback incomplete provisioning resources?",
                     parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
-					sh "terraform workspace select blueprint_provisioning_${BUILD_ID}_state"
+					sh "terraform workspace select ${deployment_id}"
 					sh "terraform destroy -input=false -auto-approve"
 				}
             }
@@ -119,7 +119,7 @@ pipeline {
       }
       steps {
 		dir("blueprints/${blueprint_name}") {   
-			sh "terraform workspace select blueprint_provisioning_${BUILD_ID}_state"
+			sh "terraform workspace select ${deployment_id}"
 			sh "terraform destroy -input=false -auto-approve"
 		}
       }
@@ -127,10 +127,27 @@ pipeline {
   }
   post {
         always {
-			dir("blueprints/${blueprint_name}") { 
-				archiveArtifacts artifacts: "${BUILD_ID}_tfplan.txt"
-				//cleanWs()
-			}
+			dir("blueprints/${blueprint_name}") {
+					archiveArtifacts artifacts: "${deployment_id}_tfplan.txt"
+					echo "Pipeline deployment id: ${deployment_id}"
+					echo "Pipeline build_number: ${env.BUILD_NUMBER}"
+					echo "Pipeline result: ${currentBuild.result}"
+				  
+				script {
+				   output = sh(script: "PGPASSWORD='Hcmp@123' psql -h 10.160.128.110 -U hcmp -d hcmp -t -c \"select row_to_json(states) from terraform_remote_state.states where name = \'${deployment_id}\';\"",, returnStdout: true).trim()
+				   url = "http://10.144.100.58:8080/add"
+				   echo "${output}"
+				   
+				  
+				   responce = sh(script: "curl -X POST -H 'Content-Type: application/json' -d '{\"deployment_id\":\"${deployment_id}\",\"status\":\"${currentBuild.result}\"}' $url",returnStdout: true).trim()
+				   echo "$responce"
+		 
+					echo "${output}"
+				 }
+
+				echo "${output}"
+				cleanWs()
+		   }
         }
     }
 }
