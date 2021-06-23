@@ -58,7 +58,7 @@ pipeline {
       steps {
 		dir("blueprints/${blueprint_name}") {   
 			sh "terraform plan -out=tfplan"
-			sh "terraform show -no-color tfplan > ${BUILD_ID}_tfplan.txt"
+			sh "terraform show -no-color tfplan > ${deployment_id}_tfplan.txt"
 		}
       }
     }
@@ -84,7 +84,7 @@ pipeline {
 			echo 'FAILED (in Terraform Apply stage - should not happen :))'
 			script {
 				dir("blueprints/${blueprint_name}") {
-					def plan = readFile "${BUILD_ID}_tfplan.txt"
+					def plan = readFile "${deployment_id}_tfplan.txt"
 					input message: "Do you want to destroy the plan to rollback incomplete provisioning resources?",
                     parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
 					sh "terraform workspace select ${deployment_id}"
@@ -104,7 +104,7 @@ pipeline {
 	   steps {
 		   dir("blueprints/${blueprint_name}") {  
             script {
-                def plan = readFile "${BUILD_ID}_tfplan.txt"
+                def plan = readFile "${deployment_id}_tfplan.txt"
                 input message: "Do you want to destroy the plan?",
                     parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
             }
