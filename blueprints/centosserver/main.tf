@@ -28,6 +28,6 @@ provider "azurerm" {
     delete_os_disk_on_termination = "true"
     data_disk           	= "%data_disk%"
     data_disk_size_gb   	= "%data_disk_size_gb%"
-    data_sa_type        	= "Premium_LRS"
+    data_sa_type        	= "Standard_LRS"
     tags                	= %tags%
   }
