@@ -135,11 +135,11 @@ pipeline {
 				  
 				script {
 				   output = sh(script: "PGPASSWORD='Hcmp@123' psql -h 10.160.128.110 -U hcmp -d hcmp -t -c \"select row_to_json(states) from terraform_remote_state.states where name = \'${deployment_id}\';\"",, returnStdout: true).trim()
-				   url = "http://10.144.100.58:8080/add"
+				   url = "http://10.160.128.113:30260/api/v1/callback/jenkins/callback/"
 				   echo "${output}"
 				   
 				  
-				   responce = sh(script: "curl -X POST -H 'Content-Type: application/json' -d '{\"deployment_id\":\"${deployment_id}\",\"status\":\"${currentBuild.result}\"}' $url",returnStdout: true).trim()
+				   responce = sh(script: "curl -X POST -H 'Content-Type: application/json' -d '{\"deploymentId\":\"${deployment_id}\",\"status\":\"${currentBuild.result}\"}' $url",returnStdout: true).trim()
 				   echo "$responce"
 		 
 					echo "${output}"
