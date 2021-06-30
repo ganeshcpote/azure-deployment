@@ -1,0 +1,35 @@
+pipeline {
+  agent any
+
+  parameters {
+        string(name: 'deployment_id', defaultValue: 'test1', description: 'Please specify deployment id (UUID)')
+    }
+  stages {
+  stage('Terraform Init') {
+      steps {
+		dir("blueprints/${blueprint_name}") {  
+			sh "terraform init -backend-config=\"conn_str=postgres://hcmp:Hcmp@123@10.160.128.110/hcmp?sslmode=disable\" -input=false"
+			sh "terraform workspace new ${deployment_id}"
+			sh "terraform workspace select  ${deployment_id}"
+			sh "terraform workspace show"
+			sh "terraform state pull"
+		  }
+       }
+    }
+  stage('Terraform Destroy') {
+      steps {
+		dir("blueprints/${blueprint_name}") {   
+			sh "terraform workspace select ${deployment_id}"
+			sh "terraform destroy -input=false -auto-approve"
+		}
+      }
+    }
+  }
+  post {
+        always {
+			dir("blueprints/${blueprint_name}") {
+				cleanWs()
+		   }
+        }
+    }
+}
