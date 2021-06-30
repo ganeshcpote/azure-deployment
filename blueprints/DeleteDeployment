@@ -20,6 +20,7 @@ pipeline {
   stage('Terraform Destroy') {
       steps {
 		dir("blueprints/${blueprint_name}") {   
+			sh "terraform init"
 			sh "terraform workspace select ${deployment_id}"
 			sh "terraform destroy -input=false -auto-approve"
 		}
